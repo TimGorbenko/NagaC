@@ -25,6 +25,9 @@ jobs:
           - os: windows-latest
             target: aarch64-pc-windows-msvc
 
+          - os: windows-latest
+            target: x86_64-pc-windows-gnu
+
           - os: macos-latest
             target: x86_64-apple-darwin
 
@@ -71,7 +74,8 @@ jobs:
       run: |
         mkdir release
         mkdir release/Include
-        cp cmake/Naga.h release/Include/
+        mkdir release/Include/Naga
+        cp cmake/Naga.h release/Include/Naga
         cp cmake/CMakeLists.txt release/
         for target in artifacts/*; do
           target_name=$(basename "$target")
