@@ -1,0 +1,11 @@
+[package]
+name = "naga-c"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+naga = { version = "29.0.3", features = ["spv-in", "wgsl-out"] }
+libc = { version = "0.2" }

@@ -1,0 +1,31 @@
+cmake_minimum_required(VERSION 3.25)
+project(NagaC)
+
+add_library(Naga STATIC IMPORTED GLOBAL)
+
+if (EMSCRIPTEN)
+	set(NAGA_LIBRARY "${CMAKE_CURRENT_LIST_DIR}/wasm32-unknown-emscripten/Naga.a")
+elseif (WIN32)
+	if (CMAKE_SYSTEM_PROCESSOR MATCHES "^(ARM64|aarch64|arm64)$" OR CMAKE_VS_PLATFORM_NAME STREQUAL "ARM64")
+		set(NAGA_LIBRARY "${CMAKE_CURRENT_LIST_DIR}/aarch64-pc-windows-msvc/Naga.lib")
+	else()
+		set(NAGA_LIBRARY "${CMAKE_CURRENT_LIST_DIR}/x86_64-pc-windows-msvc/Naga.lib")
+	endif()
+elseif (APPLE)
+	set(NAGA_LIBRARY "${CMAKE_CURRENT_LIST_DIR}/x86_64-apple-darwin/Naga.a")
+elseif (UNIX)
+	if (CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64)$")
+		set(NAGA_LIBRARY "${CMAKE_CURRENT_LIST_DIR}/aarch64-unknown-linux-gnu/Naga.a")
+	else()
+		set(NAGA_LIBRARY "${CMAKE_CURRENT_LIST_DIR}/x86_64-unknown-linux-gnu/Naga.a")
+	endif()
+else()
+	message(FATAL_ERROR "Unsupported platform.")
+endif()
+
+set_target_properties(Naga PROPERTIES IMPORTED_LOCATION "${NAGA_LIBRARY}" INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/Include")
+
+# There might more platform specific links that are required, though probably not
+if (WIN32 AND NOT MSVC)
+	target_link_libraries(Naga INTERFACE ws2_32 advapi32 bcrypt userenv ntdll)
+endif()
